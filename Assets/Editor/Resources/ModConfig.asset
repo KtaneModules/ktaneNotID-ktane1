@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 615501dbe4f3fe94fbf4b564abb10237, type: 3}
+  m_Name: ModConfig
+  m_EditorClassIdentifier: 
+  id: notIdentification
+  title: 'Identification modules: Pack 2'
+  author: ktane1
+  description: "A whole new set of more identification modules, including previously
+    deleted ones and unfinished ones, along with new ones along the way.\n\nModules
+    included: \n- Piece Identification\n- VTuber Identification\n- Touhou Identification\n-
+    FNF Identification\n- Magisword Identification\n- Stand Identification\n- Animatronic
+    Identification\n- Item Identification\n\n...all belonging to the same module,
+    Not Identification.\nMod ID: notIdentification\nManual Link: TBA"
+  version: 1.0
+  outputFolder: build
+  previewImage: {fileID: 2800000, guid: 392e043103c87574c8b1b61b2ca3f503, type: 3}
