@@ -19,7 +19,7 @@ MonoBehaviour:
     included: \n- Piece Identification\n- VTuber Identification\n- Touhou Identification\n-
     FNF Identification\n- Magisword Identification\n- Stand Identification\n- Animatronic
     Identification\n- Item Identification\n\n...all belonging to the same module,
-    Not Identification.\nMod ID: notIdentification\nManual Link: TBA"
-  version: 1.0
+    Not Identification.\nMod ID: notIdentification\nManual Link: https://ktane.timwi.de/HTML/Not%20Identification.html"
+  version: 1.0.1
   outputFolder: build
   previewImage: {fileID: 2800000, guid: 392e043103c87574c8b1b61b2ca3f503, type: 3}
