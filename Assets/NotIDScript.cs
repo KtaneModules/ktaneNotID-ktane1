@@ -232,7 +232,7 @@ public class NotIDScript : MonoBehaviour
 				idModName = "Animatronic Identification";
 				break;
 			case 7:
-				idModName = "Minecraft Identification";
+				idModName = "Item Identification";
 				break;
         }
 		Debug.LogFormat("[Not Identification #{0}] Module initiated, and it takes the form of {1}.", moduleId, idModName);
@@ -423,12 +423,15 @@ public class NotIDScript : MonoBehaviour
 				default:
 					break;
 			}
-			while ((sb.ToString()).Contains(pair.ToString()))
+			if (pair != 0)
             {
-				pair++;
-				pair = (pair % 9 + 9) % 9;
+				while ((sb.ToString()).Contains(pair.ToString()))
+				{
+					pair++;
+					pair = (pair % 9 + 9) % 9;
+				}
+				sb.Append(pair); pair = 0;
 			}
-			if (pair != 0) { sb.Append(pair); pair = 0; }
 		}
 		finalAnswer[3] = sb.ToString();
 		sb.Remove(0, sb.Length);
@@ -791,6 +794,7 @@ public class NotIDScript : MonoBehaviour
 		}
         else
         {
+			ModuleSolved = true;
 			audio.PlaySoundAtTransform("Solve1", transform);
 			foreach (MeshRenderer i in LightBulbs)
 			{
@@ -870,7 +874,10 @@ public class NotIDScript : MonoBehaviour
 			{
 				if (Input.GetKeyDown(UselessKeys[k]))
 				{
-					UselessButtons[k].OnInteract();
+					if (Stages == 3)
+                    {
+						UselessButtons[k].OnInteract();
+					}
 				}
 			}
 			for (int l = 0; l < OtherKeys.Count(); l++)
@@ -893,5 +900,157 @@ public class NotIDScript : MonoBehaviour
 		}
 	}
 
+#pragma warning disable 414
+	private readonly string TwitchHelpMessage = @"To type letters/digits/symbols, use <!{0} type [SOMETHING]>, to type useless keys, use <!{0} [KEY NAME] [KEY NAME]>, valid key names are Tab, Caps, Menu, LeftCtrl, RightCtrl, LeftWin, RightWin, LeftAlt, RightAlt, use <!{0} clear> to clear the text box or press the backspace button in stage 4, use <!{0} enter> to submit an answer";
+#pragma warning restore 414
+
+	IEnumerator ProcessTwitchCommand(string command)
+    {
+		yield return null;
+		List<KMSelectable> presses = new List<KMSelectable>();
+		if (Regex.IsMatch(command, @"^\s*start\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			yield return "sendtochat Unable to identify the module, please try again."; yield break;
+        }
+		else if (Regex.IsMatch(command, @"^\s*j\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)) { yield return "sendtochat j"; yield break; }
+		else if (Regex.IsMatch(command, @"^\s*ktane1\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant)) { yield return "sendtochat Congratulations, now you get the privileges to ping ktane1 as long as you send along a screenshot of this message!"; yield break; }
+		else if (Regex.IsMatch(command, @"^\s*clear\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			if (Stages != 3 && TextBox.text.Length == 0) { yield return "sendtochat The module is extremely confused as there is literally nothing to clear in the text box."; yield break; }
+			while (TextBox.text.Length != 0)
+			{
+				Backspace.OnInteract();
+				yield return new WaitForSecondsRealtime(0.01f);
+			}
+			Backspace.OnInteract();
+			yield return null;
+			yield break;
+		}
+		else if (Regex.IsMatch(command, @"^\s*enter\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			Enter.OnInteract();
+			yield return null;
+			if (ModuleSolved) { yield return "sendtochat PogChamp PogChamp PogChamp";}
+			yield break;
+        }
+		string[] parameters = command.Split(' ');
+		string current = "";
+		bool TPshift = Shifted;
+		if (Regex.IsMatch(parameters[0], @"^\s*type\s*$", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant))
+        {
+			if (parameters.Length > 2) { yield return "sendtochat Spacebar detected, which, somehow, is the only useless key in the keyboard. The module is now visibly more depressed than before. Don't do that again."; yield break; }
+			else if (parameters.Length < 2) { yield return "sendtochat Go on...type something..."; yield break; }
+			else
+            {
+				foreach (char c in parameters[1])
+				{
+					if (!c.ToString().EqualsAny(ChangedText[0]) && !c.ToString().EqualsAny(ChangedText[1]))
+					{
+						yield return "sendtochat The module is extremely confused/scared on what exactly do you want to type. Give it a break, come on.";
+						yield break;
+					}
+                    else
+                    {
+						current = TextBox.text;
+						if (!(c - '0' < 0 || c - '0' > 9))
+						{
+							if (TPshift) { presses.Add(ShiftButtons[0]); TPshift = false; }
+							presses.Add(TypableNumbers[c - '0']);
+						}
+                        else
+                        {
+							for (int i = 0; i < keyboardLayouts[0].Length; i++)
+							{
+								if (c == keyboardLayouts[0].ToUpperInvariant()[i])
+                                {
+									if (!TPshift) { presses.Add(ShiftButtons[0]); TPshift = true; }
+									presses.Add(TypableLetters[i]);
+								}
+								else if (c == keyboardLayouts[0].ToLowerInvariant()[i])
+								{
+									if (TPshift) { presses.Add(ShiftButtons[0]); TPshift = false; }
+									presses.Add(TypableLetters[i]);
+								}
+							}
+							for (int i = 0; i < initialSymbolString.Length; i++)
+							{
+								if (c == initialSymbolString[i][0])
+								{
+									if (i < 11)
+									{
+										if (TPshift) { presses.Add(ShiftButtons[0]); TPshift = false; }
+										presses.Add(TypableSymbols[i]);
+									}
+									else if (i > 20)
+									{
+										if (!TPshift) { presses.Add(ShiftButtons[0]); TPshift = true; }
+										presses.Add(TypableSymbols[i - 21]);
+									}
+                                    else
+                                    {
+										if (!TPshift) { presses.Add(ShiftButtons[0]); TPshift = true; }
+										if (c == ')') { presses.Add(TypableNumbers[0]); }
+                                        else { presses.Add(TypableNumbers[i - 10]); }
+									}
+								}
+							}
+						}
+					}
+				}
+				foreach (KMSelectable i in presses)
+                {
+					i.OnInteract();
+					yield return new WaitForSeconds(0.05f);
+				}
+				yield return null;
+			}
+        }
+		else
+        {
+			foreach (string lmao in parameters)
+            {
+				switch (lmao)
+                {
+					case "Tab":
+						presses.Add(UselessButtons[0]);
+						break;
+					case "Caps":
+					case "CapsLock":
+						presses.Add(UselessButtons[1]);
+						break;
+					case "LeftCtrl":
+						presses.Add(UselessButtons[2]);
+						break;
+					case "RightCtrl":
+						presses.Add(UselessButtons[8]);
+						break;
+					case "LeftWin":
+						presses.Add(UselessButtons[3]);
+						break;
+					case "RightWin":
+						presses.Add(UselessButtons[6]);
+						break;
+					case "LeftAlt":
+						presses.Add(UselessButtons[4]);
+						break;
+					case "RightAlt":
+						presses.Add(UselessButtons[5]);
+						break;
+					case "Menu":
+						presses.Add(UselessButtons[7]);
+						break;
+					default:
+						yield return "sendtochat Please send a command that is more intelligible. The module is trying its best here :("; 
+						yield break;
+				}
+            }
+			foreach (KMSelectable i in presses)
+			{
+				i.OnInteract();
+				yield return new WaitForSeconds(0.05f);
+			}
+			yield return null;
+		}
+	}
 
 }
