@@ -38,6 +38,8 @@ public class NotIDScript : MonoBehaviour
 	public TextMesh[] Text;
 	public TextMesh TextBox;
 	public GameObject TheBox;
+
+	public KMSelectable display;
 	
 	bool Shifted = false;
 		
@@ -84,18 +86,22 @@ public class NotIDScript : MonoBehaviour
 
 	private string[] finalAnswer = new string[4];
 
+	//Stage 1 things
 	private string[] keyboardLayouts = new string[] { "QWERTYUIOPASDFGHJKLZXCVBNM", "AOEUIDHTNSQJKXBMWVZPYFGCRL", "ARSTDHNEIOQWFPGJLUYZXCVBKM", "ASHTGYNEOIQDRWBJFUPZXMCVKL", "ASDTGHNIOEQWPRFYUKLXZCVBJM", "ASETGYNIOHQWDFKJURLZXCVBPM" };
 	private string[] keyboardNames = new string[] { "QWERTY", "DVORAK", "COLEMAK", "WORKMAN", "QWPR", "NORMAN" };
 	private static string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private int selectedKeyboard;
 	private string finalKeyboardLayout;
 
+	//Stage 2 things
 	private int goalNumber;
 	private string numberClues;
 
+	//Stage 3 things
 	private string[] initialSymbolString = new string[32] { "`", "-", "=", "[", "]", "\\", ";", "'", ",", ".", "/", "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "~", "_", "+", "{", "}", "|", ":", "\"", "<", ">", "?" };
 	private string[] finalSymbolString = new string[32];
 
+	//Stage 4 things
 	private StringBuilder pressedUselessKeys = new StringBuilder();
 	string[] uselessNames = new string[9] { "Tab", "Caps Lock", "Left Ctrl", "Left Win", "Left Alt", "Right Alt", "Right Win", "Menu", "Right Ctrl" };
 
@@ -112,6 +118,9 @@ public class NotIDScript : MonoBehaviour
 	void Awake()
 	{
 		moduleId = moduleIdCounter++;
+
+		display.OnInteract += () => { doNothing(); return false; };
+
 		for (int b = 0; b < TypableLetters.Count(); b++)
         {
             int KeyPress = b;
@@ -837,6 +846,29 @@ public class NotIDScript : MonoBehaviour
 		isAnimating = false;
 		yield return null;
     }
+
+	void doNothing()
+    {
+		int rnd = UnityEngine.Random.Range(0, 5);
+		switch (rnd)
+        {
+			case 0:
+				Debug.LogFormat("<Not Identification #{0}> Nice try, but this ain't your normal identification mod.", moduleId);
+				break;
+			case 1:
+				Debug.LogFormat("<Not Identification #{0}> Module activated, wait...whoops, force of habit.", moduleId);
+				break;
+			case 2:
+				Debug.LogFormat("<Not Identification #{0}> Fun fact, these logs are for fixing a bug, so yeah it's not really that useless.", moduleId);
+				break;
+			case 3:
+				Debug.LogFormat("<Not Identification #{0}> I refuse to be an ID mod. Go solve the module like intended in the manual you buffoon.", moduleId);
+				break;
+			case 4:
+				Debug.LogFormat("<Not Identification #{0}> This does nothing! ", moduleId);
+				break;
+		}
+	}
 
 	void Update()//Runs every frame.
 	{

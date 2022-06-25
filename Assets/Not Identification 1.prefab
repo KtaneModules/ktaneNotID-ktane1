@@ -15515,6 +15515,7 @@ MonoBehaviour:
   - {fileID: 102851937472954024}
   TextBox: {fileID: 102509295847299862}
   TheBox: {fileID: 1145145358313050}
+  display: {fileID: 114703944032981488}
 --- !u!114 &114260077186423630
 MonoBehaviour:
   m_ObjectHideFlags: 1
