@@ -516,7 +516,13 @@ public class NotIDScript : MonoBehaviour
                 {
 					if (uselessCheckers[i] != 1) { passable = false; }
                 }
-				if (!passable) { Debug.LogFormat("[Not Identification #{0}] Each button is not pressed only once, strike.", moduleId); module.HandleStrike(); return; }
+				if (!passable)
+                {
+					Debug.LogFormat("[Not Identification #{0}] Each button is not pressed only once, strike.", moduleId); 
+					module.HandleStrike(); 
+					pressedUselessKeys.Remove(0, pressedUselessKeys.Length);
+					return;
+				}
 				else if (finalAnswer[3] != pressedUselessKeys.ToString().Substring(0, finalAnswer[3].Length))
                 {
 					Debug.LogFormat("[Not Identification #{0}] The first few presses is wrong, strike.", moduleId);
