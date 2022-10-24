@@ -958,7 +958,7 @@ public class NotIDScript : MonoBehaviour
 			while (TextBox.text.Length != 0)
 			{
 				Backspace.OnInteract();
-				yield return new WaitForSecondsRealtime(0.01f);
+				yield return new WaitForSecondsRealtime(0.02f);
 			}
 			Backspace.OnInteract();
 			yield return null;
@@ -1091,4 +1091,94 @@ public class NotIDScript : MonoBehaviour
 		}
 	}
 
+    IEnumerator TwitchHandleForcedSolve()
+	{
+        while (!ModuleSolved)
+		{
+			if (isAnimating) { yield return null; }
+			else
+			{
+				while (TextBox.text != "")
+				{
+					Backspace.OnInteract();
+					yield return null;
+				}
+				switch (Stages)
+				{
+					case 0:
+						for (int i = 0; i < finalAnswer[0].Length; i++)
+						{
+							if ((finalAnswer[0][i] < 91 && !Shifted) || (finalAnswer[0][i] > 96 && Shifted))
+							{
+								ShiftButtons[0].OnInteract();
+								yield return null;
+							}
+							TypableLetters[finalKeyboardLayout.IndexOf(Convert.ToChar(finalAnswer[0][i].ToString().ToUpper()))].OnInteract();
+							yield return null;
+						}
+						Enter.OnInteract();
+						break;
+					case 1:
+						int digit = 0;
+						if (Shifted) { ShiftButtons[0].OnInteract(); yield return null; }
+						for (int i = 0; i < finalAnswer[1].Length; i++)
+						{
+							TypableNumbers[numberClues.IndexOf(finalAnswer[1][i])].OnInteract();
+							yield return null;
+                        }
+                        Enter.OnInteract();
+                        break;
+					case 2:
+						int symbolToPress = 0;
+						for (int i = 0; i < finalAnswer[2].Length; i++)
+						{
+							if (i == 0)
+							{
+								symbolToPress = Array.IndexOf(finalSymbolString, finalAnswer[2][i].ToString());
+							}
+							else
+							{
+								symbolToPress = Array.IndexOf(initialSymbolString, finalAnswer[2][i - 1].ToString());
+							}
+							if (symbolToPress < 11)
+							{
+                                if (Shifted) { ShiftButtons[0].OnInteract(); yield return null; }
+								TypableSymbols[symbolToPress].OnInteract(); yield return null;
+                            }
+							else if (symbolToPress > 20)
+							{
+								if (!Shifted) { ShiftButtons[0].OnInteract(); yield return null; }
+                                TypableSymbols[symbolToPress - 21].OnInteract(); yield return null;
+                            }
+							else
+							{
+                                if (!Shifted) { ShiftButtons[0].OnInteract(); yield return null; }
+                                if (symbolToPress == 20) { TypableNumbers[0].OnInteract(); yield return null; }
+								else { TypableNumbers[symbolToPress - 10].OnInteract(); yield return null; }
+                            }
+						}
+						Enter.OnInteract();
+						break;
+					case 3:
+						var f = new List<int>(){ 0, 1, 2, 3, 4, 5, 6, 7, 8 };
+						for (int i = 0; i < finalAnswer[3].Length; i++)
+						{
+							UselessButtons[finalAnswer[3][i] - '0'].OnInteract();
+							yield return null;
+							f.Remove(finalAnswer[3][i] - '0');
+						}
+						for (int i = 0; i < f.Count; i++)
+						{
+							UselessButtons[f[i]].OnInteract();
+							yield return null;
+						}
+						Enter.OnInteract();
+                        break;
+				}
+				yield return null;
+			}
+		}
+
+
+    }
 }
